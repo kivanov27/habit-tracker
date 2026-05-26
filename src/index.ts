@@ -9,6 +9,16 @@ const server = serve({
     routes: {
         // Serve index.html for all unmatched routes.
         "/*": index,
+
+        // User endpoints
+        "/api/me": {
+            async GET(req) {
+                const user = verifyToken(req);
+                if (!user) return Response.json({ authentication: false }, { status: 401 });
+                return Response.json({ authentication: true , user });
+            },
+        },
+
         "/api/register": {
             async POST(req) {
                 const { username, email, password } = await req.json();
@@ -23,6 +33,7 @@ const server = serve({
                 return Response.json({ success: true });
             },
         },
+
         "/api/login": {
             async POST(req) {
                 const { username, password } = await req.json();
@@ -45,7 +56,7 @@ const server = serve({
                 }
 
                 const token = jwt.sign(
-                    { id: user.id, username: user.username },
+                    { id: Number(user.id), username: user.username },
                     process.env.JWT_SECRET!,
                     { expiresIn: "7d" }
                 );
@@ -58,6 +69,7 @@ const server = serve({
                 });
             },
         },
+
         "/api/protected": {
             async GET(req) {
                 const user = verifyToken(req);
@@ -65,12 +77,40 @@ const server = serve({
                 return Response.json({ success: true, user });
             },
         },
+
+        // Habit endpoints
+        "/api/habits": {
+            async GET(req) {
+                const user = verifyToken(req);
+                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+                const res = await db.execute({
+                    sql: "SELECT * FROM habits WHERE userId = ?",
+                    args: [user.id],
+                });
+
+                return Response.json({ habits: res.rows });
+            },
+
+            async POST(req) {
+                const user = verifyToken(req);
+                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+                const { habit, color } = await req.json();
+
+                const res = await db.execute({
+                    sql: "INSERT INTO habits (userId, habit, color) VALUES (?, ?, ?) RETURNING *",
+                    args: [user.id, habit, color]
+                });
+
+                return Response.json({ success: true, habit: res.rows[0] });
+            }
+        }
     },
 
     development: process.env.NODE_ENV !== "production" && {
         // Enable browser hot reloading in development
         hmr: true,
-
         // Echo console logs from the browser to the server
         console: true,
     },

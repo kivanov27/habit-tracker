@@ -1,16 +1,31 @@
+import type { Habit } from "@/types";
 import { useState } from "react";
 
 interface HabitFormProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setHabits: React.Dispatch<React.SetStateAction<Habit[]>>;
 }
 
-const HabitForm = ({ open, setOpen }: HabitFormProps) => {
+const HabitForm = ({ open, setOpen, setHabits }: HabitFormProps) => {
     const [habit, setHabit] = useState<string>("");
     const [color, setColor] = useState<string>("");
 
-    const submitForm = (e: React.SyntheticEvent) => {
+    const submitForm = async (e: React.SyntheticEvent) => {
         e.preventDefault();
+
+        const res = await fetch("/api/habits", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ habit, color })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            setHabits(prev => [...prev, data.habit]);
+        }
+
         setOpen(false);
     };
 
