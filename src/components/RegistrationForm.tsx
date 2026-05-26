@@ -1,17 +1,37 @@
 import { useState } from "react";
 
-const RegistrationForm = () => {
+interface RegistrationFormProps {
+    setRegistering: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const RegistrationForm = ({ setRegistering }: RegistrationFormProps) => {
     const [username, setUsername] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
 
-    const handleRegistration = (e: React.SyntheticEvent) => {
+    const handleRegistration = async (e: React.SyntheticEvent) => {
         e.preventDefault();
+
         if (!isValidPassword(password)) {
             setError('password must be at least 6 characters long, contain an uppercase and lowercase letter, a digit and a special symbol');
         }
         else {
             setError("");
+
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            if (res.ok) {
+                alert("registered successfully");
+                setRegistering(false);
+            }
+            else {
+                console.error("couldn't register");
+            }
         }
     };
 
@@ -23,9 +43,9 @@ const RegistrationForm = () => {
     return (
         <form 
             onSubmit={handleRegistration}
-            className="flex flex-col gap-y-4"
+            className="flex flex-col gap-y-4 w-fit"
         >
-            <div className="flex gap-x-2 justify-center items-center">
+            <div className="flex gap-x-2 justify-end items-center">
                 <label>username:</label>
                 <input
                     type="text"
@@ -34,7 +54,16 @@ const RegistrationForm = () => {
                 />
             </div>
 
-            <div className="flex gap-x-2 justify-center items-center">
+            <div className="flex gap-x-2 justify-end items-center">
+                <label>email:</label>
+                <input
+                    type="email"
+                    value={email}
+                    onChange={({ target }) => setEmail(target.value)}
+                />
+            </div>
+
+            <div className="flex gap-x-2 justify-end items-center">
                 <label>password:</label>
                 <input
                     type="password"

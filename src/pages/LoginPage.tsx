@@ -8,8 +8,8 @@ const LoginPage = () => {
     return (
         <div className="max-w-7xl mx-auto p-8 text-center relative z-10 min-h-screen flex flex-col justify-center">
             {registering ?
-                <div className="flex flex-col gap-y-4">
-                    <RegistrationForm />
+                <div className="flex flex-col gap-y-4 items-center">
+                    <RegistrationForm setRegistering={setRegistering} />
                     <div
                         onClick={() => setRegistering(false)}
                         className="hover:underline hover:text-(--text-color-darker) cursor-pointer"
