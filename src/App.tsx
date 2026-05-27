@@ -8,7 +8,13 @@ const App = () => {
     const [user, setUser] = useState<User | null>(null);
     const [habits, setHabits] = useState<Habit[]>([]);
     const [formOpen, setFormOpen] = useState<boolean>(false);
+
     const navigate = useNavigate();
+    const dates = Array.from({ length: 7 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split("T")[0];
+    }).reverse();
 
     useEffect(() => {
         const fetchHabits = async () => {
@@ -57,11 +63,11 @@ const App = () => {
                         <li key={habit.id} className="flex gap-x-2">
                             <input type="checkbox" onChange={(e) => handleCompletion(habit.id, e.target.checked)} />
                             <p>{habit.habit}</p>
-                            <div>
-                                {habit.completions.slice(-7).map(c =>
-                                    <div 
-                                        key={c} 
-                                        className={`${c ? "bg-green-200" : "bg-black"} w-8 h-8`}
+                            <div className="flex">
+                                {dates.map(date =>
+                                    <div
+                                        key={date}
+                                        className={`${habit.completions.includes(date) ? "bg-green-200" : "bg-red-200"} w-8 h-8 border border-gray-700`}
                                     ></div>
                                 )}
                             </div>
