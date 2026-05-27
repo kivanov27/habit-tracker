@@ -135,6 +135,22 @@ const server = serve({
                 });
 
                 return Response.json({ success: true });
+            },
+
+            async DELETE(req) {
+                const user = verifyToken(req);
+                const habitId = Number(req.params.id);
+                const today = new Date().toISOString().split("T")[0] as string;
+
+                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+                else if (isNaN(habitId)) return Response.json({ error: "Invalid id" }, { status: 400 });
+
+                await db.execute({
+                    sql: "DELETE FROM habitCompletions WHERE habitId = ? AND completedAt = ? AND userId = ?",
+                    args: [habitId, today, user.id]
+                });
+
+                return Response.json({ success: true });
             }
         }
     },

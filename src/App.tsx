@@ -33,6 +33,17 @@ const App = () => {
         checkUser();
     }, []);
 
+    const handleCompletion = async (habitId: number, checked: boolean) => {
+        try {
+            await fetch(`/api/habit/${habitId}`, { 
+                method: checked ? "POST" : "DELETE" 
+            });
+        }
+        catch (err) {
+            console.error("Failed to completed habit: ", err);
+        }
+    };
+
     return (
         <div className="relative">
             {user &&
@@ -44,7 +55,10 @@ const App = () => {
             <div className="flex flex-col items-center pt-16 gap-y-8">
                 <ul className="flex flex-col">
                     {habits.map(habit =>
-                        <li key={habit.id}>{habit.habit}</li>
+                        <li key={habit.id} className="flex gap-x-2">
+                            <input type="checkbox" onChange={(e) => handleCompletion(habit.id, e.target.checked)} />
+                            <p>{habit.habit}</p>
+                        </li>
                     )}
                 </ul>
 
