@@ -32,7 +32,7 @@ const HabitForm = ({ open, setOpen, setHabits }: HabitFormProps) => {
     return (
         <form 
             onSubmit={submitForm}
-            className={`${open ? 'flex' : 'hidden'} flex-col border-2 border-(--text-color) p-8 items-center gap-y-4 my-4`}
+            className={`${open ? 'flex' : 'hidden'} flex-col border-2 border-(--text-color) w-4xl ms-16 p-8 items-center gap-y-4 my-4`}
         >
             <div className="flex gap-x-2 items-center">
                 <label>habit:</label>
@@ -59,7 +59,10 @@ const HabitForm = ({ open, setOpen, setHabits }: HabitFormProps) => {
                     submit
                 </button>
                 <button
-                    onClick={() => setOpen(false)}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setOpen(false);
+                    }}
                 >
                     close
                 </button>
