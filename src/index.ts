@@ -85,11 +85,24 @@ const server = serve({
                 if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
                 const res = await db.execute({
-                    sql: "SELECT * FROM habits WHERE userId = ?",
+                    sql: `
+                        SELECT 
+                            habits.*,
+                            GROUP_CONCAT(habitCompletions.completedAt) as habitCompletions   
+                        FROM habits
+                        LEFT JOIN habitCompletions ON habits.id = habitCompletions.habitId
+                        WHERE habits.userId = ?
+                        GROUP BY habits.id
+                    `,
                     args: [user.id],
                 });
 
-                return Response.json({ habits: res.rows });
+                const habits = res.rows.map(row => ({
+                    ...row,
+                    completions: row.completions ? (row.completions as string).split(",") : []
+                }));
+
+                return Response.json({ habits });
             },
 
             async POST(req) {
@@ -104,6 +117,24 @@ const server = serve({
                 });
 
                 return Response.json({ success: true, habit: res.rows[0] });
+            },
+        },
+
+        "/api/habits/:id": {
+            async POST(req) {
+                const user = verifyToken(req);
+                const habitId = Number(req.params.id);
+                const today = new Date().toISOString().split("T")[0] as string;
+
+                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+                else if (isNaN(habitId)) return Response.json({ error: "Invalid id" }, { status: 400 });
+
+                await db.execute({
+                    sql: "INSERT INTO habitCompletions (habitId, completedAt, userId) VALUES (?, ?, ?)",
+                    args: [habitId, today, user.id]
+                });
+
+                return Response.json({ success: true });
             }
         }
     },

@@ -34,18 +34,27 @@ const App = () => {
     }, []);
 
     return (
-        <div className="max-w-7xl mx-auto p-8 text-center relative z-10">
-            <ul className="flex flex-col">
-                {habits.map(habit =>
-                    <li key={habit.id}>{habit.habit}</li>
-                )}
-            </ul>
-            <button
-                onClick={() => setFormOpen(true)}
-                className="cursor-pointer border border-(--text-color) w-fit p-2 transition-colors duration-200 active:bg-(--text-color)"
-            >
-                add habit
-            </button>
+        <div className="relative">
+            {user &&
+                <div className="absolute top-1 left-1">
+                    user: {user.username}
+                </div>
+            }
+
+            <div className="flex flex-col items-center pt-16 gap-y-8">
+                <ul className="flex flex-col">
+                    {habits.map(habit =>
+                        <li key={habit.id}>{habit.habit}</li>
+                    )}
+                </ul>
+
+                <button
+                    onClick={() => setFormOpen(true)}
+                    className="cursor-pointer border border-(--text-color) w-fit p-2 transition-colors duration-200 active:bg-(--text-color)"
+                >
+                    add habit
+                </button>
+            </div>
 
             <HabitForm open={formOpen} setOpen={setFormOpen} setHabits={setHabits} />
         </div>
