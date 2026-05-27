@@ -7,6 +7,10 @@ export interface Habit {
     id: number;
     habit: string;
     color: string;
+    completions: string[];
 }
 
-export type NewHabit = Omit<Habit, 'id'>;
+export interface NewHabit {
+    habit: string;
+    color: string;
+}

@@ -29,13 +29,12 @@ const App = () => {
             }
         };
 
-
         checkUser();
     }, []);
 
     const handleCompletion = async (habitId: number, checked: boolean) => {
         try {
-            await fetch(`/api/habit/${habitId}`, { 
+            await fetch(`/api/habits/${habitId}`, { 
                 method: checked ? "POST" : "DELETE" 
             });
         }
