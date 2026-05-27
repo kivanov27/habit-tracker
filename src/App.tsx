@@ -2,6 +2,7 @@ import "./index.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { Habit, User } from "./types";
+import Header from "./components/Header";
 import HabitForm from "./components/HabitForm";
 
 const App = () => {
@@ -38,11 +39,21 @@ const App = () => {
         checkUser();
     }, []);
 
-    const handleCompletion = async (habitId: number, checked: boolean) => {
+    const handleCompletion = async (habitId: number, date: string, complete: boolean) => {
         try {
             await fetch(`/api/habits/${habitId}`, { 
-                method: checked ? "POST" : "DELETE" 
+                method: complete ? "DELETE" : "POST" 
             });
+
+            setHabits(prev => prev.map(habit => {
+                if (habit.id !== habitId) return habit;
+                return {
+                    ...habit,
+                    completions: complete
+                        ? habit.completions.filter(d => d !== date)
+                        : [...habit.completions, date]
+                };
+            }));
         }
         catch (err) {
             console.error("Failed to completed habit: ", err);
@@ -52,26 +63,24 @@ const App = () => {
     return (
         <div className="relative">
             {user &&
-                <div className="absolute top-1 left-1">
-                    user: {user.username}
-                </div>
+                <Header user={user} />
             }
 
-            <div className="flex flex-col p-16">
+            <div className="flex flex-col px-16 py-8">
+
                 <ul className="flex flex-col gap-y-8">
                     {habits.map(habit =>
                         <li key={habit.id} className="flex items-center">
-                            <input 
-                                type="checkbox" 
-                                onChange={(e) => handleCompletion(habit.id, e.target.checked)}
-                                className="me-2"
-                            />
                             <p className="w-32">{habit.habit}</p>
                             <div className="flex">
                                 {dates.map(date =>
                                     <div
                                         key={date}
-                                        className={`${habit.completions.includes(date as string) ? "bg-green-200" : "bg-red-200"} w-8 h-8 border border-gray-700`}
+                                        className={`
+                                            ${habit.completions.includes(date as string) ? "bg-green-200" : "bg-red-200"}
+                                            w-8 h-8 border border-gray-700 cursor-pointer
+                                        `}
+                                        onClick={() => handleCompletion(habit.id, date as string, habit.completions.includes(date as string))}
                                     ></div>
                                 )}
                             </div>
@@ -79,10 +88,7 @@ const App = () => {
                     )}
                 </ul>
 
-                <button
-                    onClick={() => setFormOpen(true)}
-                    className="mt-16"
-                >
+                <button onClick={() => setFormOpen(true)} className="mt-8">
                     add habit
                 </button>
             </div>
