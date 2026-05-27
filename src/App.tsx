@@ -57,6 +57,14 @@ const App = () => {
                         <li key={habit.id} className="flex gap-x-2">
                             <input type="checkbox" onChange={(e) => handleCompletion(habit.id, e.target.checked)} />
                             <p>{habit.habit}</p>
+                            <div>
+                                {habit.completions.slice(-7).map(c =>
+                                    <div 
+                                        key={c} 
+                                        className={`${c ? "bg-green-200" : "bg-black"} w-8 h-8`}
+                                    ></div>
+                                )}
+                            </div>
                         </li>
                     )}
                 </ul>

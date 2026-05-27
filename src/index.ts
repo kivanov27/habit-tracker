@@ -88,7 +88,7 @@ const server = serve({
                     sql: `
                         SELECT 
                             habits.*,
-                            GROUP_CONCAT(habitCompletions.completedAt) as habitCompletions   
+                            GROUP_CONCAT(habitCompletions.completedAt) as completions   
                         FROM habits
                         LEFT JOIN habitCompletions ON habits.id = habitCompletions.habitId
                         WHERE habits.userId = ?
