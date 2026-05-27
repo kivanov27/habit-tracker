@@ -57,17 +57,21 @@ const App = () => {
                 </div>
             }
 
-            <div className="flex flex-col items-center pt-16 gap-y-8">
-                <ul className="flex flex-col">
+            <div className="flex flex-col p-16">
+                <ul className="flex flex-col gap-y-8">
                     {habits.map(habit =>
-                        <li key={habit.id} className="flex gap-x-2">
-                            <input type="checkbox" onChange={(e) => handleCompletion(habit.id, e.target.checked)} />
-                            <p>{habit.habit}</p>
+                        <li key={habit.id} className="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                onChange={(e) => handleCompletion(habit.id, e.target.checked)}
+                                className="me-2"
+                            />
+                            <p className="w-32">{habit.habit}</p>
                             <div className="flex">
                                 {dates.map(date =>
                                     <div
                                         key={date}
-                                        className={`${habit.completions.includes(date) ? "bg-green-200" : "bg-red-200"} w-8 h-8 border border-gray-700`}
+                                        className={`${habit.completions.includes(date as string) ? "bg-green-200" : "bg-red-200"} w-8 h-8 border border-gray-700`}
                                     ></div>
                                 )}
                             </div>
@@ -77,7 +81,7 @@ const App = () => {
 
                 <button
                     onClick={() => setFormOpen(true)}
-                    className="cursor-pointer border border-(--text-color) w-fit p-2 transition-colors duration-200 active:bg-(--text-color)"
+                    className="mt-16"
                 >
                     add habit
                 </button>
