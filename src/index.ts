@@ -70,6 +70,17 @@ const server = serve({
             },
         },
 
+        "/api/logout": {
+            async POST() {
+                return new Response(JSON.stringify({ success: true }), {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Set-Cookie": "token=; HttpOnly; Secure; SameSite=Strict; Path=/; MaxAge=0"
+                    },
+                });
+            },
+        },
+
         "/api/protected": {
             async GET(req) {
                 const user = verifyToken(req);

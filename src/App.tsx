@@ -11,6 +11,7 @@ const App = () => {
     const [formOpen, setFormOpen] = useState<boolean>(false);
 
     const navigate = useNavigate();
+
     const dates = Array.from({ length: 7 }, (_, i) => {
         const date = new Date();
         date.setDate(date.getDate() - i);
@@ -60,10 +61,18 @@ const App = () => {
         }
     };
 
+    const handleLogout = async () => {
+        setUser(null);
+        await fetch("/api/logout", {
+            method: "POST"
+        });
+        navigate("/login");
+    };
+
     return (
         <div className="relative">
             {user &&
-                <Header user={user} />
+                <Header user={user} handleLogout={handleLogout} />
             }
 
             <div className="flex flex-col px-16 py-8">
