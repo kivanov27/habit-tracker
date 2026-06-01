@@ -86,9 +86,9 @@ const server = serve({
 
                 const res = await db.execute({
                     sql: `
-                        SELECT 
+                        SELECT
                             habits.*,
-                            GROUP_CONCAT(habitCompletions.completedAt) as completions   
+                            GROUP_CONCAT(habitCompletions.completedAt) as completions
                         FROM habits
                         LEFT JOIN habitCompletions ON habits.id = habitCompletions.habitId
                         WHERE habits.userId = ?
@@ -122,32 +122,44 @@ const server = serve({
 
         "/api/habits/:id": {
             async POST(req) {
+                const url = new URL(req.url);
+                const date = url.searchParams.get("date");
                 const user = verifyToken(req);
                 const habitId = Number(req.params.id);
-                const today = new Date().toISOString().split("T")[0] as string;
+                // const today = new Date().toISOString().split("T")[0] as string;
 
-                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-                else if (isNaN(habitId)) return Response.json({ error: "Invalid id" }, { status: 400 });
+                if (!user) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+                else if (isNaN(habitId)) {
+                    return Response.json({ error: "Invalid id" }, { status: 400 });
+                }
 
                 await db.execute({
                     sql: "INSERT INTO habitCompletions (habitId, completedAt, userId) VALUES (?, ?, ?)",
-                    args: [habitId, today, user.id]
+                    args: [habitId, date, user.id]
                 });
 
                 return Response.json({ success: true });
             },
 
             async DELETE(req) {
+                const url = new URL(req.url);
+                const date = url.searchParams.get("date");
                 const user = verifyToken(req);
                 const habitId = Number(req.params.id);
-                const today = new Date().toISOString().split("T")[0] as string;
+                // const today = new Date().toISOString().split("T")[0] as string;
 
-                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-                else if (isNaN(habitId)) return Response.json({ error: "Invalid id" }, { status: 400 });
+                if (!user) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+                else if (isNaN(habitId)) {
+                    return Response.json({ error: "Invalid id" }, { status: 400 });
+                }
 
                 await db.execute({
                     sql: "DELETE FROM habitCompletions WHERE habitId = ? AND completedAt = ? AND userId = ?",
-                    args: [habitId, today, user.id]
+                    args: [habitId, date, user.id]
                 });
 
                 return Response.json({ success: true });

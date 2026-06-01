@@ -41,8 +41,8 @@ const App = () => {
 
     const handleCompletion = async (habitId: number, date: string, complete: boolean) => {
         try {
-            await fetch(`/api/habits/${habitId}`, { 
-                method: complete ? "DELETE" : "POST" 
+            await fetch(`/api/habits/${habitId}?date=${date}`, {
+                method: complete ? "DELETE" : "POST",
             });
 
             setHabits(prev => prev.map(habit => {
