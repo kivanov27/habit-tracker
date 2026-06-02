@@ -2,6 +2,7 @@ import "./index.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { Habit, User } from "./types";
+import { HabitView } from "./types";
 import Header from "./components/Header";
 import HabitForm from "./components/HabitForm";
 
@@ -9,6 +10,7 @@ const App = () => {
     const [user, setUser] = useState<User | null>(null);
     const [habits, setHabits] = useState<Habit[]>([]);
     const [formOpen, setFormOpen] = useState<boolean>(false);
+    const [view, setView] = useState<HabitView>(HabitView.Weekly);
 
     const navigate = useNavigate();
 

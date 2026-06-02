@@ -14,3 +14,9 @@ export interface NewHabit {
     habit: string;
     color: string;
 }
+
+export enum HabitView {
+    Weekly,
+    Monthly,
+    Yearly
+}

@@ -13,13 +13,19 @@ body {
 }
 
 button {
+    position: relative;
     cursor: pointer;
     border: solid 1px var(--text-color);
+    border-radius: 0.25rem;
     width: fit-content;
-    padding: 0.5rem;
+    padding: 0.25rem;
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function) /* cubic-bezier(0.4, 0, 0.2, 1) */);
     transition-duration: var(--tw-duration, var(--default-transition-duration) /* 150ms */);
+}
+
+button:hover {
+    background-color: #737373;
 }
 
 button:active {
