@@ -138,6 +138,27 @@ const server = serve({
         },
 
         "/api/habits/:id": {
+            async DELETE(req) {
+                const user = verifyToken(req);
+                const habitId = Number(req.params.id);
+
+                if (!user) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+                else if (isNaN(habitId)) {
+                    return Response.json({ error: "Invalid id" }, { status: 400 });
+                }
+
+                await db.execute({
+                    sql: "DELETE FROM habits WHERE id = ?",
+                    args: [habitId]
+                });
+
+                return Response.json({ success: true });
+            }
+        },
+
+        "/api/habits/completions/:id": {
             async POST(req) {
                 const url = new URL(req.url);
                 const date = url.searchParams.get("date");

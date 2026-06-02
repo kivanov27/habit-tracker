@@ -5,6 +5,7 @@ import type { Habit, User } from "./types";
 import { HabitView } from "./types";
 import Header from "./components/Header";
 import HabitForm from "./components/HabitForm";
+import { Pencil, Trash } from "lucide-react";
 
 const App = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -62,10 +63,6 @@ const App = () => {
 
     const handleCompletion = async (habitId: number, date: string, complete: boolean) => {
         try {
-            await fetch(`/api/habits/${habitId}?date=${date}`, {
-                method: complete ? "DELETE" : "POST",
-            });
-
             setHabits(prev => prev.map(habit => {
                 if (habit.id !== habitId) return habit;
                 return {
@@ -75,17 +72,36 @@ const App = () => {
                         : [...habit.completions, date]
                 };
             }));
+
+            await fetch(`/api/habits/completions/${habitId}?date=${date}`, {
+                method: complete ? "DELETE" : "POST",
+            });
         }
         catch (err) {
             console.error("Failed to completed habit: ", err);
         }
     };
 
+    const handleDelete = async (habitId: number) => {
+        try {
+            setHabits(prev => prev.filter(habit => habit.id !== habitId));
+
+            await fetch(`/api/habits/${habitId}`, {
+                method: "DELETE"
+            });
+        }
+        catch (err) {
+            console.error("Failed to delete habit: ", err);
+        }
+    };
+
     const handleLogout = async () => {
         setUser(null);
+
         await fetch("/api/logout", {
             method: "POST"
         });
+
         navigate("/login");
     };
 
@@ -121,10 +137,16 @@ const App = () => {
                 <ul className="flex flex-col gap-y-8">
                     {habits.map(habit =>
                         <li key={habit.id}>
-                            <div>
-                                <p className="text-center mb-1">{habit.habit}</p>
-                                <button>edit</button>
-                                <button>delete</button>
+                            <div className="flex justify-center items-center gap-x-2 mb-1">
+                                <p className="text-center">{habit.habit}</p>
+                                <button>
+                                    <Pencil size={16} />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(habit.id)}
+                                >
+                                    <Trash size={16} />
+                                </button>
                             </div>
                             <div className="flex flex-wrap max-w-240">
                                 {dates.map(date =>
