@@ -77,7 +77,29 @@ const App = () => {
                 <Header user={user} handleLogout={handleLogout} />
             }
 
-            <div className="flex flex-col px-16 py-8">
+
+            <div className="flex flex-col px-16 py-8 gap-y-8">
+
+                <div className="flex gap-x-1">
+                    <button 
+                        onClick={() => setView(HabitView.Weekly)}
+                        className={`${view == HabitView.Weekly ? "bg-neutral-500" : ""}`}
+                    >
+                        weekly
+                    </button>
+                    <button 
+                        onClick={() => setView(HabitView.Monthly)}
+                        className={`${view == HabitView.Monthly ? "bg-neutral-500" : ""}`}
+                    >
+                        monthly
+                    </button>
+                    <button 
+                        onClick={() => setView(HabitView.Yearly)}
+                        className={`${view == HabitView.Yearly ? "bg-neutral-500" : ""}`}
+                    >
+                        yearly
+                    </button>
+                </div>
 
                 <ul className="flex flex-col gap-y-8">
                     {habits.map(habit =>
@@ -99,7 +121,7 @@ const App = () => {
                     )}
                 </ul>
 
-                <button onClick={() => setFormOpen(true)} className="mt-8">
+                <button onClick={() => setFormOpen(true)}>
                     add habit
                 </button>
             </div>
