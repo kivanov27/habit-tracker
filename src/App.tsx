@@ -10,15 +10,10 @@ const App = () => {
     const [user, setUser] = useState<User | null>(null);
     const [habits, setHabits] = useState<Habit[]>([]);
     const [formOpen, setFormOpen] = useState<boolean>(false);
+    const [dates, setDates] = useState<(string | undefined)[]>([]);
     const [view, setView] = useState<HabitView>(HabitView.Weekly);
 
     const navigate = useNavigate();
-
-    const dates = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        return date.toISOString().split("T")[0];
-    }).reverse();
 
     useEffect(() => {
         const fetchHabits = async () => {
@@ -41,6 +36,29 @@ const App = () => {
 
         checkUser();
     }, []);
+
+    useEffect(() => {
+        let days;
+
+        switch (view) {
+            case HabitView.Weekly: 
+                days = 7;
+                break;
+            case HabitView.Monthly: 
+                days = 30;
+                break;
+            case HabitView. Yearly: 
+                days = 255;
+                break;
+            default: days = 7;
+        }
+
+        setDates(Array.from({ length: days }, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            return date.toISOString().split("T")[0];
+        }).reverse());
+    }, [view]);
 
     const handleCompletion = async (habitId: number, date: string, complete: boolean) => {
         try {
@@ -78,7 +96,7 @@ const App = () => {
             }
 
 
-            <div className="flex flex-col px-16 py-8 gap-y-8">
+            <div className="max-w-7xl mx-auto flex flex-col items-center px-16 py-8 gap-y-8">
 
                 <div className="flex gap-x-1">
                     <button 
@@ -103,9 +121,9 @@ const App = () => {
 
                 <ul className="flex flex-col gap-y-8">
                     {habits.map(habit =>
-                        <li key={habit.id} className="flex items-center">
-                            <p className="w-32">{habit.habit}</p>
-                            <div className="flex">
+                        <li key={habit.id}>
+                            <p className="text-center mb-1">{habit.habit}</p>
+                            <div className="flex flex-wrap max-w-240">
                                 {dates.map(date =>
                                     <div
                                         key={date}
