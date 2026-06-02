@@ -1,4 +1,4 @@
-import type { Habit } from "@/types";
+import type { Habit, NewHabit } from "@/types";
 import { useState } from "react";
 
 interface HabitFormProps {
@@ -14,10 +14,15 @@ const HabitForm = ({ open, setOpen, setHabits }: HabitFormProps) => {
     const submitForm = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
+        const newHabit: NewHabit = {
+            habit,
+            color
+        };
+
         const res = await fetch("/api/habits", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ habit, color })
+            body: JSON.stringify(newHabit)
         });
 
         const data = await res.json();
@@ -32,7 +37,7 @@ const HabitForm = ({ open, setOpen, setHabits }: HabitFormProps) => {
     return (
         <form 
             onSubmit={submitForm}
-            className={`${open ? 'flex' : 'hidden'} flex-col border-2 border-(--text-color) w-4xl ms-16 p-8 items-center gap-y-4 my-4`}
+            className={`${open ? 'flex' : 'hidden'} flex-col border-2 border-(--text-color) w-4xl mx-auto my-4 p-8 items-center gap-y-4`}
         >
             <div className="flex gap-x-2 items-center">
                 <label>habit:</label>

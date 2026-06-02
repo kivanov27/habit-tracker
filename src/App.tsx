@@ -95,7 +95,6 @@ const App = () => {
                 <Header user={user} handleLogout={handleLogout} />
             }
 
-
             <div className="max-w-7xl mx-auto flex flex-col items-center px-16 py-8 gap-y-8">
 
                 <div className="flex gap-x-1">
@@ -122,7 +121,11 @@ const App = () => {
                 <ul className="flex flex-col gap-y-8">
                     {habits.map(habit =>
                         <li key={habit.id}>
-                            <p className="text-center mb-1">{habit.habit}</p>
+                            <div>
+                                <p className="text-center mb-1">{habit.habit}</p>
+                                <button>edit</button>
+                                <button>delete</button>
+                            </div>
                             <div className="flex flex-wrap max-w-240">
                                 {dates.map(date =>
                                     <div

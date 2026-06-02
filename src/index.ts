@@ -127,7 +127,13 @@ const server = serve({
                     args: [user.id, habit, color]
                 });
 
-                return Response.json({ success: true, habit: res.rows[0] });
+                return Response.json({ 
+                    success: true, 
+                    habit: { 
+                        ...res.rows[0], 
+                        completions: [] 
+                    }
+                });
             },
         },
 
@@ -137,7 +143,6 @@ const server = serve({
                 const date = url.searchParams.get("date");
                 const user = verifyToken(req);
                 const habitId = Number(req.params.id);
-                // const today = new Date().toISOString().split("T")[0] as string;
 
                 if (!user) {
                     return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -159,7 +164,6 @@ const server = serve({
                 const date = url.searchParams.get("date");
                 const user = verifyToken(req);
                 const habitId = Number(req.params.id);
-                // const today = new Date().toISOString().split("T")[0] as string;
 
                 if (!user) {
                     return Response.json({ error: "Unauthorized" }, { status: 401 });
