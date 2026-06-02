@@ -1,7 +1,7 @@
 import "./index.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import type { Habit, User } from "./types";
+import type { Habit, NewHabit, User } from "./types";
 import { HabitView } from "./types";
 import Header from "./components/Header";
 import HabitForm from "./components/HabitForm";
@@ -61,7 +61,23 @@ const App = () => {
         }).reverse());
     }, [view]);
 
-    const handleCompletion = async (habitId: number, date: string, complete: boolean) => {
+    const handleAddHabit = async (newHabit: NewHabit) => {
+        setFormOpen(false);
+
+        const res = await fetch("/api/habits", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newHabit)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            setHabits(prev => [...prev, data.habit]);
+        }
+    };
+
+    const handleCompleteHabit = async (habitId: number, date: string, complete: boolean) => {
         try {
             setHabits(prev => prev.map(habit => {
                 if (habit.id !== habitId) return habit;
@@ -82,7 +98,7 @@ const App = () => {
         }
     };
 
-    const handleDelete = async (habitId: number) => {
+    const handleDeleteHabit = async (habitId: number) => {
         try {
             setHabits(prev => prev.filter(habit => habit.id !== habitId));
 
@@ -143,12 +159,12 @@ const App = () => {
                                     <Pencil size={16} />
                                 </button>
                                 <button
-                                    onClick={() => handleDelete(habit.id)}
+                                    onClick={() => handleDeleteHabit(habit.id)}
                                 >
                                     <Trash size={16} />
                                 </button>
                             </div>
-                            <div className="flex flex-wrap max-w-240">
+                            <div className="flex flex-wrap max-w-125">
                                 {dates.map(date =>
                                     <div
                                         key={date}
@@ -156,7 +172,7 @@ const App = () => {
                                             ${habit.completions.includes(date as string) ? "bg-green-200" : "bg-red-200"}
                                             w-8 h-8 border border-gray-700 cursor-pointer
                                         `}
-                                        onClick={() => handleCompletion(habit.id, date as string, habit.completions.includes(date as string))}
+                                        onClick={() => handleCompleteHabit(habit.id, date as string, habit.completions.includes(date as string))}
                                     ></div>
                                 )}
                             </div>
@@ -169,7 +185,7 @@ const App = () => {
                 </button>
             </div>
 
-            <HabitForm open={formOpen} setOpen={setFormOpen} setHabits={setHabits} />
+            {formOpen && <HabitForm handleAddHabit={handleAddHabit} setOpen={setFormOpen} />}
         </div>
     );
 }

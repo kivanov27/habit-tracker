@@ -1,13 +1,12 @@
-import type { Habit, NewHabit } from "@/types";
+import type { NewHabit } from "@/types";
 import { useState } from "react";
 
 interface HabitFormProps {
-    open: boolean;
+    handleAddHabit: (newHabit: NewHabit) => void;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    setHabits: React.Dispatch<React.SetStateAction<Habit[]>>;
 }
 
-const HabitForm = ({ open, setOpen, setHabits }: HabitFormProps) => {
+const HabitForm = ({ handleAddHabit, setOpen }: HabitFormProps) => {
     const [habit, setHabit] = useState<string>("");
     const [color, setColor] = useState<string>("");
 
@@ -19,60 +18,56 @@ const HabitForm = ({ open, setOpen, setHabits }: HabitFormProps) => {
             color
         };
 
-        const res = await fetch("/api/habits", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newHabit)
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            setHabits(prev => [...prev, data.habit]);
-        }
-
-        setOpen(false);
+        handleAddHabit(newHabit);
     };
 
     return (
-        <form 
-            onSubmit={submitForm}
-            className={`${open ? 'flex' : 'hidden'} flex-col border-2 border-(--text-color) w-4xl mx-auto my-4 p-8 items-center gap-y-4`}
+        <div 
+            onClick={() => setOpen(false)}
+            className="w-screen h-screen bg-black/50 fixed top-0 left-0 flex justify-center items-center"
         >
-            <div className="flex gap-x-2 items-center">
-                <label>habit:</label>
-                <input 
-                    type="text" 
-                    value={habit}
-                    onChange={({ target }) => setHabit(target.value)} 
-                />
-            </div>
+            <form 
+                onSubmit={submitForm}
+                onClick={(e) => e.stopPropagation()}
+                className="flex flex-col border-2 border-(--text-color) w-4xl mx-auto my-auto p-8 items-center gap-y-4 bg-(--bg-color) rounded-sm"
+            >
+                <div className="flex gap-x-2 items-center">
+                    <label>habit:</label>
+                    <input 
+                        type="text" 
+                        value={habit}
+                        onChange={({ target }) => setHabit(target.value)} 
+                        className="rounded-sm"
+                    />
+                </div>
 
-            <div className="flex gap-x-2 items-center">
-                <label>color:</label>
-                <input
-                    type="color"
-                    value={color}
-                    onChange={({ target }) => setColor(target.value)}
-                />
-            </div>
+                <div className="flex gap-x-2 items-center">
+                    <label>color:</label>
+                    <input
+                        type="color"
+                        value={color}
+                        onChange={({ target }) => setColor(target.value)}
+                        className="rounded-sm"
+                    />
+                </div>
 
-            <div className="flex gap-x-2">
-                <button 
-                    type="submit"
-                >
-                    submit
-                </button>
-                <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        setOpen(false);
-                    }}
-                >
-                    close
-                </button>
-            </div>
-        </form>
+                <div className="flex gap-x-2">
+                    <button 
+                        type="submit"
+                    >
+                        submit
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setOpen(false);
+                        }}
+                    >
+                        close
+                    </button>
+                </div>
+            </form>
+        </div>
     );
 };
 
