@@ -8,7 +8,7 @@ interface HabitFormProps {
 
 const HabitForm = ({ handleAddHabit, setOpen }: HabitFormProps) => {
     const [habit, setHabit] = useState<string>("");
-    const [color, setColor] = useState<string>("");
+    const [color, setColor] = useState<string>("#000000");
 
     const submitForm = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -35,6 +35,7 @@ const HabitForm = ({ handleAddHabit, setOpen }: HabitFormProps) => {
                     <label>habit:</label>
                     <input 
                         type="text" 
+                        required
                         value={habit}
                         onChange={({ target }) => setHabit(target.value)} 
                         className="rounded-sm"
