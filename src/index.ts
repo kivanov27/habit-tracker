@@ -14,7 +14,12 @@ const server = serve({
         "/api/me": {
             async GET(req) {
                 const user = verifyToken(req);
-                if (!user) return Response.json({ authentication: false }, { status: 401 });
+                if (!user) {
+                    return Response.json(
+                        { authentication: false }, 
+                        { status: 401 }
+                    );
+                } 
                 return Response.json({ authentication: true , user });
             },
         },
@@ -26,7 +31,10 @@ const server = serve({
                 const passwordHash = await bcrypt.hash(password, saltRounds);
 
                 await db.execute({
-                    sql: "INSERT INTO users (username, email, passwordHash) VALUES (?, ?, ?)",
+                    sql: `
+                        INSERT INTO users (username, email, passwordHash) 
+                        VALUES (?, ?, ?)
+                    `,
                     args: [username, email, passwordHash],
                 });
 
@@ -39,20 +47,29 @@ const server = serve({
                 const { username, password } = await req.json();
 
                 const res = await db.execute({
-                    sql: "SELECT * FROM users WHERE username = ?",
+                    sql: `
+                        SELECT * FROM users 
+                        WHERE username = ?
+                    `,
                     args: [username],
                 });
 
                 const user = res.rows[0];
 
                 if (!user) {
-                    return Response.json({ success: false, error: "Invalid username or password" }, { status: 401 });
+                    return Response.json(
+                        { success: false, error: "Invalid username or password" }, 
+                        { status: 401 }
+                    );
                 }
 
                 const passwordMatch = await bcrypt.compare(password, user.passwordHash as string);
 
                 if (!passwordMatch) {
-                    return Response.json({ success: false, error: "Invalid username or password" }, { status: 401 });
+                    return Response.json(
+                        { success: false, error: "Invalid username or password" }, 
+                        { status: 401 }
+                    );
                 }
 
                 const token = jwt.sign(
@@ -84,7 +101,12 @@ const server = serve({
         "/api/protected": {
             async GET(req) {
                 const user = verifyToken(req);
-                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+                if (!user) {
+                    return Response.json(
+                        { error: "Unauthorized" }, 
+                        { status: 401 }
+                    );
+                }
                 return Response.json({ success: true, user });
             },
         },
@@ -93,7 +115,12 @@ const server = serve({
         "/api/habits": {
             async GET(req) {
                 const user = verifyToken(req);
-                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+                if (!user) {
+                    return Response.json(
+                        { error: "Unauthorized" }, 
+                        { status: 401 }
+                    );
+                } 
 
                 const res = await db.execute({
                     sql: `
@@ -118,12 +145,21 @@ const server = serve({
 
             async POST(req) {
                 const user = verifyToken(req);
-                if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+                if (!user) {
+                    return Response.json(
+                        { error: "Unauthorized" }, 
+                        { status: 401 }
+                    );
+                }
 
                 const { habit, color } = await req.json();
 
                 const res = await db.execute({
-                    sql: "INSERT INTO habits (userId, habit, color) VALUES (?, ?, ?) RETURNING *",
+                    sql: `
+                        INSERT INTO habits (userId, habit, color) 
+                        VALUES (?, ?, ?) 
+                        RETURNING *
+                    `,
                     args: [user.id, habit, color]
                 });
 
@@ -138,6 +174,40 @@ const server = serve({
         },
 
         "/api/habits/:id": {
+            async PUT(req) {
+                const user = verifyToken(req);
+                const id = Number(req.params.id);
+                const updatedHabit = await req.json();
+
+                if (!user) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+                else if (isNaN(id)) {
+                    return Response.json({ error: "Invalid id" }, { status: 400 });
+                }
+
+                const res = await db.execute({
+                    sql: `
+                        UPDATE habits
+                        SET habit = ?, color = ?
+                        WHERE id = ? AND userId = ?
+                        RETURNING *
+                    `,
+                    args: [updatedHabit.habit, updatedHabit.color, id, user.id]
+                });
+
+                if (res.rows.length === 0) {
+                    return Response.json(
+                        { error: "Habit not found" },
+                        { status: 404 }
+                    );
+                }
+
+                return Response.json({ 
+                    success: true,
+                    updatedHabit: res.rows[0]
+                });
+            },
             async DELETE(req) {
                 const user = verifyToken(req);
                 const habitId = Number(req.params.id);
@@ -150,8 +220,11 @@ const server = serve({
                 }
 
                 await db.execute({
-                    sql: "DELETE FROM habits WHERE id = ?",
-                    args: [habitId]
+                    sql: `
+                        DELETE FROM habits 
+                        WHERE id = ? AND userId = ?
+                    `,
+                    args: [habitId, user.id]
                 });
 
                 return Response.json({ success: true });
@@ -173,7 +246,10 @@ const server = serve({
                 }
 
                 await db.execute({
-                    sql: "INSERT INTO habitCompletions (habitId, completedAt, userId) VALUES (?, ?, ?)",
+                    sql: `
+                        INSERT INTO habitCompletions (habitId, completedAt, userId) 
+                        VALUES (?, ?, ?)
+                    `,
                     args: [habitId, date, user.id]
                 });
 
@@ -194,7 +270,10 @@ const server = serve({
                 }
 
                 await db.execute({
-                    sql: "DELETE FROM habitCompletions WHERE habitId = ? AND completedAt = ? AND userId = ?",
+                    sql: `
+                        DELETE FROM habitCompletions
+                        WHERE habitId = ? AND completedAt = ? AND userId = ?
+                    `,
                     args: [habitId, date, user.id]
                 });
 

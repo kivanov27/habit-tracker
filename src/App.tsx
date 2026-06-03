@@ -13,6 +13,7 @@ const App = () => {
     const [formOpen, setFormOpen] = useState<boolean>(false);
     const [dates, setDates] = useState<(string | undefined)[]>([]);
     const [view, setView] = useState<HabitView>(HabitView.Weekly);
+    const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
 
     const navigate = useNavigate();
 
@@ -98,6 +99,23 @@ const App = () => {
         }
     };
 
+    const handleEditHabit = async (updatedHabit: Habit) => {
+        try {
+            setHabits(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+            setHabitToEdit(null);
+            setFormOpen(false);
+
+            await fetch(`/api/habits/${updatedHabit.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedHabit)
+            });
+        }
+        catch (err) {
+            console.error("Failed to update habit: ", err);
+        }
+    };
+
     const handleDeleteHabit = async (habitId: number) => {
         try {
             setHabits(prev => prev.filter(habit => habit.id !== habitId));
@@ -155,7 +173,12 @@ const App = () => {
                         <li key={habit.id}>
                             <div className="flex justify-center items-center gap-x-2 mb-1">
                                 <p className="text-center">{habit.habit}</p>
-                                <button>
+                                <button
+                                    onClick={() => {
+                                        setHabitToEdit(habit);
+                                        setFormOpen(true);
+                                    }}
+                                >
                                     <Pencil size={16} />
                                 </button>
                                 <button
@@ -185,7 +208,7 @@ const App = () => {
                 </button>
             </div>
 
-            {formOpen && <HabitForm handleAddHabit={handleAddHabit} setOpen={setFormOpen} />}
+            {formOpen && <HabitForm handleAddHabit={handleAddHabit} handleEditHabit={handleEditHabit} existingHabit={habitToEdit} setOpen={setFormOpen} />}
         </div>
     );
 }

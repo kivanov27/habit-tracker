@@ -1,24 +1,25 @@
-import type { NewHabit } from "@/types";
+import type { Habit, NewHabit } from "@/types";
 import { useState } from "react";
 
 interface HabitFormProps {
     handleAddHabit: (newHabit: NewHabit) => void;
+    handleEditHabit?: (updatedHabit: Habit) => void;
+    existingHabit?: Habit | null;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const HabitForm = ({ handleAddHabit, setOpen }: HabitFormProps) => {
-    const [habit, setHabit] = useState<string>("");
-    const [color, setColor] = useState<string>("#000000");
+const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen }: HabitFormProps) => {
+    const [habit, setHabit] = useState<string>(existingHabit?.habit ?? "");
+    const [color, setColor] = useState<string>(existingHabit?.color ?? "#000000");
 
     const submitForm = async (e: React.SyntheticEvent) => {
         e.preventDefault();
-
-        const newHabit: NewHabit = {
-            habit,
-            color
-        };
-
-        handleAddHabit(newHabit);
+        if (existingHabit && handleEditHabit) {
+            handleEditHabit({ ...existingHabit, habit, color });
+        }
+        else {
+            handleAddHabit({ habit, color });
+        }
     };
 
     return (
@@ -56,7 +57,7 @@ const HabitForm = ({ handleAddHabit, setOpen }: HabitFormProps) => {
                     <button 
                         type="submit"
                     >
-                        submit
+                        {existingHabit ? "edit" : "submit"}
                     </button>
                     <button
                         onClick={(e) => {
