@@ -32,10 +32,10 @@ const server = serve({
 
                 await db.execute({
                     sql: `
-                        INSERT INTO users (username, email, passwordHash) 
-                        VALUES (?, ?, ?)
+                        INSERT INTO users (username, email, passwordHash, level, xp) 
+                        VALUES (?, ?, ?, ?, ?)
                     `,
-                    args: [username, email, passwordHash],
+                    args: [username, email, passwordHash, 1, 0],
                 });
 
                 return Response.json({ success: true });
@@ -73,7 +73,12 @@ const server = serve({
                 }
 
                 const token = jwt.sign(
-                    { id: Number(user.id), username: user.username },
+                    { 
+                        id: Number(user.id), 
+                        username: user.username,
+                        level: user.level,
+                        xp: user.xp
+                    },
                     process.env.JWT_SECRET!,
                     { expiresIn: "7d" }
                 );
@@ -108,6 +113,39 @@ const server = serve({
                     );
                 }
                 return Response.json({ success: true, user });
+            },
+        },
+
+        "/api/user/:id": {
+            async PUT(req) {
+                const user = verifyToken(req);
+                if (!user) {
+                    return Response.json(
+                        { error: "Unauthorized" },
+                        { status: 401 }
+                    );
+                }
+                const id = req.params.id;
+                const { level, xp } = await req.json();
+                const res = await db.execute({
+                    sql: `
+                        UPDATE users
+                        SET level = ? AND xp = ?
+                        WHERE id = ?
+                        RETURNING *
+                    `,
+                    args: [level, xp, id]
+                });
+
+                const newUser = res.rows[0];
+                if (!newUser) {
+                    return Response.json(
+                        { error: "User not found" }, 
+                        { status: 404 }
+                    );
+                }
+
+                return Response.json({ success: true, newUser});
             },
         },
 
