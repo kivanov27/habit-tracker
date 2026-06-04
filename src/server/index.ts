@@ -15,8 +15,8 @@ const server = serve({
             async GET(req) {
                 const token = verifyToken(req);
                 if (!token) {
-                    return Response.json({ authentication: false },{ status: 401 });
-                } 
+                    return Response.json({ authentication: false }, { status: 401 });
+                }
 
                 const res = await db.execute({
                     sql: `
@@ -26,7 +26,7 @@ const server = serve({
                     `,
                     args: [token.id]
                 });
-                return Response.json({ authentication: true , user: res.rows[0] });
+                return Response.json({ authentication: true, user: res.rows[0] });
             },
         },
 
@@ -38,7 +38,7 @@ const server = serve({
 
                 await db.execute({
                     sql: `
-                        INSERT INTO users (username, email, passwordHash, level, xp) 
+                        INSERT INTO users (username, email, passwordHash, level, xp)
                         VALUES (?, ?, ?, ?, ?)
                     `,
                     args: [username, email, passwordHash, 1, 0],
@@ -54,7 +54,7 @@ const server = serve({
 
                 const res = await db.execute({
                     sql: `
-                        SELECT * FROM users 
+                        SELECT * FROM users
                         WHERE username = ?
                     `,
                     args: [username],
@@ -64,7 +64,7 @@ const server = serve({
 
                 if (!user) {
                     return Response.json(
-                        { success: false, error: "Invalid username or password" }, 
+                        { success: false, error: "Invalid username or password" },
                         { status: 401 }
                     );
                 }
@@ -73,14 +73,14 @@ const server = serve({
 
                 if (!passwordMatch) {
                     return Response.json(
-                        { success: false, error: "Invalid username or password" }, 
+                        { success: false, error: "Invalid username or password" },
                         { status: 401 }
                     );
                 }
 
                 const token = jwt.sign(
-                    { 
-                        id: Number(user.id), 
+                    {
+                        id: Number(user.id),
                         username: user.username,
                     },
                     process.env.JWT_SECRET!,
@@ -112,7 +112,7 @@ const server = serve({
                 const token = verifyToken(req);
                 if (!token) {
                     return Response.json(
-                        { error: "Unauthorized" }, 
+                        { error: "Unauthorized" },
                         { status: 401 }
                     );
                 }
@@ -120,62 +120,53 @@ const server = serve({
             },
         },
 
-        // "/api/users/xp": {
-        //     async POST(req) {
-        //         const token = verifyToken(req);
-        //         if (!token) {
-        //             return Response.json({ error: "Unauthorized" }, { status: 401 });
-        //         }
-        //
-        //         const { amount } = await req.json();
-        //         if (typeof amount !== "number") {
-        //             return Response.json({ error: "Invalid amount" }, { status: 400 });
-        //         }
-        //
-        //         const resUser = await db.execute({
-        //             sql: `
-        //                 SELECT *
-        //                 FROM users
-        //                 WHERE id = ?
-        //             `,
-        //             args: [token.id]
-        //         });
-        //
-        //         const user = resUser.rows[0];
-        //         if (user) {
-        //             let xp = user.xp + amount;
-        //             let level = user.level;
-        //
-        //             while (xp >= 100) {
-        //                 xp -= 100;
-        //                 level++;
-        //             }
-        //
-        //             const res = await db.execute({
-        //                 sql: `
-        //                     UPDATE users
-        //                     SET level = ?, xp = ?
-        //                     WHERE id = ?
-        //                     RETURNING *
-        //                 `,
-        //                 args: [level, xp, user.id]
-        //             });
-        //
-        //             const newUser = res.rows[0];
-        //             if (!newUser) {
-        //                 return Response.json(
-        //                     { error: "User not found" }, 
-        //                     { status: 404 }
-        //                 );
-        //             }
-        //
-        //             return Response.json({ success: true, newUser});
-        //         }
-        //         else {
-        //             return Response.json({ error: "User not found" }, { status: 404 });
-        //         }
-        //     },
-        // },
+        "/api/users/xp": {
+            async POST(req) {
+                const token = verifyToken(req);
+                if (!token) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+
+                const { amount } = await req.json();
+                if (typeof amount !== "number") {
+                    return Response.json({ error: "Invalid amount" }, { status: 400 });
+                }
+
+                const resUser = await db.execute({
+                    sql: `
+                        SELECT id, level, xp
+                        FROM users
+                        WHERE id = ?
+                    `,
+                    args: [token.id]
+                });
+
+                const user = resUser.rows[0];
+                if (!user) {
+                    return Response.json({ error: "User not found" }, { status: 404 });
+                }
+
+                const totalXp = Number(user.xp) + amount;
+                const levelsGained = Math.floor(totalXp / 100);
+                const level = Number(user.level) + levelsGained;
+                const xp = totalXp % 100;
+
+                const res = await db.execute({
+                    sql: `
+                            UPDATE users
+                            SET level = ?, xp = ?
+                            WHERE id = ?
+                            RETURNING *
+                        `,
+                    args: [level, xp, Number(user.id)]
+                });
+
+                return Response.json({
+                    success: true,
+                    user: res.rows[0]
+                });
+            },
+        },
 
         // Habit endpoints
         "/api/habits": {
@@ -183,10 +174,10 @@ const server = serve({
                 const user = verifyToken(req);
                 if (!user) {
                     return Response.json(
-                        { error: "Unauthorized" }, 
+                        { error: "Unauthorized" },
                         { status: 401 }
                     );
-                } 
+                }
 
                 const res = await db.execute({
                     sql: `
@@ -213,7 +204,7 @@ const server = serve({
                 const user = verifyToken(req);
                 if (!user) {
                     return Response.json(
-                        { error: "Unauthorized" }, 
+                        { error: "Unauthorized" },
                         { status: 401 }
                     );
                 }
@@ -222,18 +213,18 @@ const server = serve({
 
                 const res = await db.execute({
                     sql: `
-                        INSERT INTO habits (userId, habit, color) 
-                        VALUES (?, ?, ?) 
+                        INSERT INTO habits (userId, habit, color)
+                        VALUES (?, ?, ?)
                         RETURNING *
                     `,
                     args: [user.id, habit, color]
                 });
 
-                return Response.json({ 
-                    success: true, 
-                    habit: { 
-                        ...res.rows[0], 
-                        completions: [] 
+                return Response.json({
+                    success: true,
+                    habit: {
+                        ...res.rows[0],
+                        completions: []
                     }
                 });
             },
@@ -269,7 +260,7 @@ const server = serve({
                     );
                 }
 
-                return Response.json({ 
+                return Response.json({
                     success: true,
                     updatedHabit: res.rows[0]
                 });
@@ -287,7 +278,7 @@ const server = serve({
 
                 await db.execute({
                     sql: `
-                        DELETE FROM habits 
+                        DELETE FROM habits
                         WHERE id = ? AND userId = ?
                     `,
                     args: [habitId, user.id]
@@ -313,7 +304,7 @@ const server = serve({
 
                 await db.execute({
                     sql: `
-                        INSERT INTO habitCompletions (habitId, completedAt, userId) 
+                        INSERT INTO habitCompletions (habitId, completedAt, userId)
                         VALUES (?, ?, ?)
                     `,
                     args: [habitId, date, user.id]

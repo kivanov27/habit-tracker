@@ -17,39 +17,46 @@ const App = () => {
 
     const navigate = useNavigate();
 
+    const fetchUser = async () => {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        if (data.authentication) {
+            return data.user;
+        }
+        return null;
+    };
+
+    const fetchHabits = async () => {
+        const res = await fetch("/api/habits");
+        const data = await res.json();
+        setHabits(data.habits);
+    };
+
     useEffect(() => {
-        const fetchHabits = async () => {
-            const res = await fetch("/api/habits");
-            const data = await res.json();
-            setHabits(data.habits);
-        };
-
-        const checkUser = async () => {
-            const res = await fetch("/api/me");
-            const data = await res.json();
-            if (data.authentication) {
-                setUser(data.user);
-                fetchHabits();
-            }
-            else {
+        const init = async () => {
+            const user = await fetchUser();
+            if (!user) {
                 navigate("/login");
+                return;
             }
-        };
+            setUser(user);
+            await fetchHabits();
+        }
 
-        checkUser();
+        init();
     }, []);
 
     useEffect(() => {
         let days;
 
         switch (view) {
-            case HabitView.Weekly: 
+            case HabitView.Weekly:
                 days = 7;
                 break;
-            case HabitView.Monthly: 
+            case HabitView.Monthly:
                 days = 30;
                 break;
-            case HabitView. Yearly: 
+            case HabitView.Yearly:
                 days = 255;
                 break;
             default: days = 7;
@@ -93,7 +100,7 @@ const App = () => {
                 }));
 
                 // Add xp to user
-                handleGainXp(user.id, 1);
+                complete ? handleGainXp(-1) : handleGainXp(1);
 
                 // Change habits in db
                 await fetch(`/api/habits/completions/${habitId}?date=${date}`, {
@@ -146,18 +153,20 @@ const App = () => {
         navigate("/login");
     };
 
-    const handleGainXp = async (id: number, amount: number) => {
+    const handleGainXp = async (amount: number) => {
         // if u wanna do optimistic update, save previous state and revert to it in the catch block
         try {
-            const res = await fetch(`api/users/${id}/xp`, {
+            const res = await fetch(`api/users/xp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount })
             });
 
             const data = await res.json();
-            setUser(data);
-        } 
+            if (data.success) {
+                setUser(data.user);
+            }
+        }
         catch (err) {
             console.error("Couldn't update xp: ", err);
         }
@@ -172,19 +181,19 @@ const App = () => {
             <div className="max-w-7xl mx-auto flex flex-col items-center px-16 py-8 gap-y-8">
 
                 <div className="flex gap-x-1">
-                    <button 
+                    <button
                         onClick={() => setView(HabitView.Weekly)}
                         className={`${view == HabitView.Weekly ? "bg-neutral-500" : ""}`}
                     >
                         weekly
                     </button>
-                    <button 
+                    <button
                         onClick={() => setView(HabitView.Monthly)}
                         className={`${view == HabitView.Monthly ? "bg-neutral-500" : ""}`}
                     >
                         monthly
                     </button>
-                    <button 
+                    <button
                         onClick={() => setView(HabitView.Yearly)}
                         className={`${view == HabitView.Yearly ? "bg-neutral-500" : ""}`}
                     >
