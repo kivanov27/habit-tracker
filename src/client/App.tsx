@@ -80,19 +80,26 @@ const App = () => {
 
     const handleCompleteHabit = async (habitId: number, date: string, complete: boolean) => {
         try {
-            setHabits(prev => prev.map(habit => {
-                if (habit.id !== habitId) return habit;
-                return {
-                    ...habit,
-                    completions: complete
-                        ? habit.completions.filter(d => d !== date)
-                        : [...habit.completions, date]
-                };
-            }));
+            if (user) {
+                // Change habits in state
+                setHabits(prev => prev.map(habit => {
+                    if (habit.id !== habitId) return habit;
+                    return {
+                        ...habit,
+                        completions: complete
+                            ? habit.completions.filter(d => d !== date)
+                            : [...habit.completions, date]
+                    };
+                }));
 
-            await fetch(`/api/habits/completions/${habitId}?date=${date}`, {
-                method: complete ? "DELETE" : "POST",
-            });
+                // Add xp to user
+                handleGainXp(user.id, 1);
+
+                // Change habits in db
+                await fetch(`/api/habits/completions/${habitId}?date=${date}`, {
+                    method: complete ? "DELETE" : "POST",
+                });
+            }
         }
         catch (err) {
             console.error("Failed to completed habit: ", err);
@@ -137,6 +144,23 @@ const App = () => {
         });
 
         navigate("/login");
+    };
+
+    const handleGainXp = async (id: number, amount: number) => {
+        // if u wanna do optimistic update, save previous state and revert to it in the catch block
+        try {
+            const res = await fetch(`api/users/${id}/xp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount })
+            });
+
+            const data = await res.json();
+            setUser(data);
+        } 
+        catch (err) {
+            console.error("Couldn't update xp: ", err);
+        }
     };
 
     return (

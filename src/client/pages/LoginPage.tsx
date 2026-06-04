@@ -1,6 +1,6 @@
 import { useState } from "react";
-import LoginForm from "@/components/LoginForm";
-import RegistrationForm from "@/components/RegistrationForm";
+import LoginForm from "../components/LoginForm";
+import RegistrationForm from "../components/RegistrationForm";
 
 const LoginPage = () => {
     const [registering, setRegistering] = useState<boolean>(false);

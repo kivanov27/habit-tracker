@@ -16,4 +16,3 @@ export const verifyToken = (req: Request): TokenPayload | null => {
         return null;
     }
 };
-

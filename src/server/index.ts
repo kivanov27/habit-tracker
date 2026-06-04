@@ -1,9 +1,9 @@
 import { serve } from "bun";
-import index from "./index.html";
+import index from "../client/index.html";
 import bcrypt from "bcrypt";
-import { db } from "./lib/db";
+import { db } from "./db";
 import jwt from "jsonwebtoken";
-import { verifyToken } from "./lib/auth";
+import { verifyToken } from "./middleware/auth";
 
 const server = serve({
     routes: {
@@ -13,14 +13,20 @@ const server = serve({
         // User endpoints
         "/api/me": {
             async GET(req) {
-                const user = verifyToken(req);
-                if (!user) {
-                    return Response.json(
-                        { authentication: false }, 
-                        { status: 401 }
-                    );
+                const token = verifyToken(req);
+                if (!token) {
+                    return Response.json({ authentication: false },{ status: 401 });
                 } 
-                return Response.json({ authentication: true , user });
+
+                const res = await db.execute({
+                    sql: `
+                        SELECT *
+                        FROM users
+                        WHERE id = ?
+                    `,
+                    args: [token.id]
+                });
+                return Response.json({ authentication: true , user: res.rows[0] });
             },
         },
 
@@ -76,8 +82,6 @@ const server = serve({
                     { 
                         id: Number(user.id), 
                         username: user.username,
-                        level: user.level,
-                        xp: user.xp
                     },
                     process.env.JWT_SECRET!,
                     { expiresIn: "7d" }
@@ -105,49 +109,73 @@ const server = serve({
 
         "/api/protected": {
             async GET(req) {
-                const user = verifyToken(req);
-                if (!user) {
+                const token = verifyToken(req);
+                if (!token) {
                     return Response.json(
                         { error: "Unauthorized" }, 
                         { status: 401 }
                     );
                 }
-                return Response.json({ success: true, user });
+                return Response.json({ success: true });
             },
         },
 
-        "/api/user/:id": {
-            async PUT(req) {
-                const user = verifyToken(req);
-                if (!user) {
-                    return Response.json(
-                        { error: "Unauthorized" },
-                        { status: 401 }
-                    );
-                }
-                const id = req.params.id;
-                const { level, xp } = await req.json();
-                const res = await db.execute({
-                    sql: `
-                        UPDATE users
-                        SET level = ? AND xp = ?
-                        WHERE id = ?
-                        RETURNING *
-                    `,
-                    args: [level, xp, id]
-                });
-
-                const newUser = res.rows[0];
-                if (!newUser) {
-                    return Response.json(
-                        { error: "User not found" }, 
-                        { status: 404 }
-                    );
-                }
-
-                return Response.json({ success: true, newUser});
-            },
-        },
+        // "/api/users/xp": {
+        //     async POST(req) {
+        //         const token = verifyToken(req);
+        //         if (!token) {
+        //             return Response.json({ error: "Unauthorized" }, { status: 401 });
+        //         }
+        //
+        //         const { amount } = await req.json();
+        //         if (typeof amount !== "number") {
+        //             return Response.json({ error: "Invalid amount" }, { status: 400 });
+        //         }
+        //
+        //         const resUser = await db.execute({
+        //             sql: `
+        //                 SELECT *
+        //                 FROM users
+        //                 WHERE id = ?
+        //             `,
+        //             args: [token.id]
+        //         });
+        //
+        //         const user = resUser.rows[0];
+        //         if (user) {
+        //             let xp = user.xp + amount;
+        //             let level = user.level;
+        //
+        //             while (xp >= 100) {
+        //                 xp -= 100;
+        //                 level++;
+        //             }
+        //
+        //             const res = await db.execute({
+        //                 sql: `
+        //                     UPDATE users
+        //                     SET level = ?, xp = ?
+        //                     WHERE id = ?
+        //                     RETURNING *
+        //                 `,
+        //                 args: [level, xp, user.id]
+        //             });
+        //
+        //             const newUser = res.rows[0];
+        //             if (!newUser) {
+        //                 return Response.json(
+        //                     { error: "User not found" }, 
+        //                     { status: 404 }
+        //                 );
+        //             }
+        //
+        //             return Response.json({ success: true, newUser});
+        //         }
+        //         else {
+        //             return Response.json({ error: "User not found" }, { status: 404 });
+        //         }
+        //     },
+        // },
 
         // Habit endpoints
         "/api/habits": {
