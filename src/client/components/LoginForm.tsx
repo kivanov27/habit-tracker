@@ -18,7 +18,7 @@ const LoginForm = () => {
         const data = await res.json();
 
         if (data.success) {
-            navigate("/");
+            navigate("/habits");
         }
         else {
             setError(data.error);
@@ -26,7 +26,7 @@ const LoginForm = () => {
     };
 
     return (
-        <form 
+        <form
             onSubmit={handleLogin}
             className="flex flex-col gap-y-4 w-fit"
         >

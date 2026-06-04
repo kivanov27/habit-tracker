@@ -9,8 +9,8 @@ function start() {
     root.render(
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<App />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/*" element={<App />} />
             </Routes>
         </BrowserRouter>
     );
@@ -18,7 +18,7 @@ function start() {
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);
-} 
+}
 else {
     start();
 }

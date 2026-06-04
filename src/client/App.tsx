@@ -1,9 +1,10 @@
 import "./index.css";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, Route, Routes, useNavigate } from "react-router";
 import type { User } from "./types";
 import Header from "./components/Header";
-import HabitPage from "./pages/Habits";
+import HabitPage from "./pages/HabitPage";
+import TodoPage from "./pages/TodoPage";
 
 const App = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -61,12 +62,18 @@ const App = () => {
     };
 
     if (!user) {
-        return <p>404 not found</p>
+        return <p>Loading...</p>
     }
+
     return (
         <div className="relative">
             <Header user={user} handleLogout={handleLogout} />
-            <HabitPage user={user} handleGainXp={handleGainXp} />
+
+            <Routes>
+                <Route path="/" element={<Navigate to="/habits" replace />} />
+                <Route path="/habits" element={<HabitPage user={user} handleGainXp={handleGainXp} />} />
+                <Route path="/todos" element={<TodoPage user={user} handleGainXp={handleGainXp} />} />
+            </Routes>
         </div>
     );
 }
