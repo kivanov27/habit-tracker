@@ -5,12 +5,13 @@ import { Eye, EyeOff } from "lucide-react";
 const LoginForm = () => {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [error, setError] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.SyntheticEvent) => {
         e.preventDefault();
+
         const res = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

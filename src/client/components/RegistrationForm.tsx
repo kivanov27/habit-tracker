@@ -9,14 +9,20 @@ const RegistrationForm = ({ setRegistering }: RegistrationFormProps) => {
     const [username, setUsername] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [error, setError] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
 
     const handleRegistration = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
         if (!isValidPassword(password)) {
             setError('password must be at least 6 characters long, contain an uppercase and lowercase letter, a digit and a special symbol');
+        }
+        else if (password !== confirmPassword) {
+            setError("passwords do not match");
+            return;
         }
         else {
             setError("");
@@ -43,59 +49,83 @@ const RegistrationForm = ({ setRegistering }: RegistrationFormProps) => {
     };
 
     return (
-        <form
-            onSubmit={handleRegistration}
-            className="flex flex-col gap-y-4 w-fit"
-        >
-            <div className="flex gap-x-2 justify-end items-center">
-                <label>username:</label>
-                <input
-                    type="text"
-                    value={username}
-                    onChange={({ target }) => setUsername(target.value)}
-                />
-            </div>
-
-            <div className="flex gap-x-2 justify-end items-center">
-                <label>email:</label>
-                <input
-                    type="email"
-                    value={email}
-                    onChange={({ target }) => setEmail(target.value)}
-                />
-            </div>
-
-            <div className="flex gap-x-2 justify-end items-center relative">
-                <label>password:</label>
-                <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={({ target }) => setPassword(target.value)}
-                />
-                {showPassword ?
-                    <EyeOff
-                        size={16}
-                        onClick={() => setShowPassword(false)}
-                        className="absolute right-[-22] cursor-pointer"
+        <div>
+            <form
+                onSubmit={handleRegistration}
+                className="flex flex-col gap-y-4 w-fit mx-auto"
+            >
+                <div className="flex gap-x-2 justify-end items-center">
+                    <label>username:</label>
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={({ target }) => setUsername(target.value)}
                     />
-                    :
-                    <Eye
-                        size={16}
-                        onClick={() => setShowPassword(true)}
-                        className="absolute right-[-22] cursor-pointer"
+                </div>
+
+                <div className="flex gap-x-2 justify-end items-center">
+                    <label>email:</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={({ target }) => setEmail(target.value)}
                     />
-                }
-            </div>
+                </div>
+
+                <div className="flex gap-x-2 justify-end items-center relative">
+                    <label>password:</label>
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={({ target }) => setPassword(target.value)}
+                    />
+                    {showPassword ?
+                        <EyeOff
+                            size={16}
+                            onClick={() => setShowPassword(false)}
+                            className="absolute right-[-22] cursor-pointer"
+                        />
+                        :
+                        <Eye
+                            size={16}
+                            onClick={() => setShowPassword(true)}
+                            className="absolute right-[-22] cursor-pointer"
+                        />
+                    }
+                </div>
+
+                <div className="flex gap-x-2 justify-end items-center relative">
+                    <label>confirm password:</label>
+                    <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={({ target }) => setConfirmPassword(target.value)}
+                    />
+                    {showConfirmPassword ?
+                        <EyeOff
+                            size={16}
+                            onClick={() => setShowConfirmPassword(false)}
+                            className="absolute right-[-22] cursor-pointer"
+                        />
+                        :
+                        <Eye
+                            size={16}
+                            onClick={() => setShowConfirmPassword(true)}
+                            className="absolute right-[-22] cursor-pointer"
+                        />
+                    }
+                </div>
+
+                <button
+                    type="submit"
+                    className="mx-auto"
+                >
+                    register
+                </button>
+            </form>
 
             {error && <p className="text-red-300">{error}</p>}
-
-            <button
-                type="submit"
-                className="mx-auto"
-            >
-                register
-            </button>
-        </form>
+        </div>
     );
 };
 
