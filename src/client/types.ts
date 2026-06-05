@@ -19,7 +19,7 @@ export interface NewHabit {
 }
 
 export enum HabitView {
-    Weekly,
-    Monthly,
-    Yearly
+    Weekly = "weekly",
+    Monthly = "monthly",
+    Yearly = "yearly"
 }

@@ -12,9 +12,9 @@ interface HabitsProps {
 const HabitPage = ({ user, handleGainXp }: HabitsProps) => {
     const [habits, setHabits] = useState<Habit[]>([]);
     const [formOpen, setFormOpen] = useState<boolean>(false);
-    const [dates, setDates] = useState<(string | undefined)[]>([]);
-    const [view, setView] = useState<HabitView>(HabitView.Weekly);
     const [habitToEdit, setHabitToEdit] = useState<Habit | null>(null);
+    const [view, setView] = useState<HabitView>(HabitView.Weekly);
+    const [dates, setDates] = useState<(string | undefined)[]>([]);
 
     const fetchHabits = async () => {
         const res = await fetch("/api/habits");
@@ -129,53 +129,64 @@ const HabitPage = ({ user, handleGainXp }: HabitsProps) => {
             <div className="max-w-7xl mx-auto flex flex-col items-center px-16 py-8 gap-y-8">
 
                 <div className="flex gap-x-1">
-                    <button
-                        onClick={() => setView(HabitView.Weekly)}
-                        className={`${view == HabitView.Weekly ? "bg-neutral-500" : ""}`}
-                    >
-                        weekly
-                    </button>
-                    <button
-                        onClick={() => setView(HabitView.Monthly)}
-                        className={`${view == HabitView.Monthly ? "bg-neutral-500" : ""}`}
-                    >
-                        monthly
-                    </button>
-                    <button
-                        onClick={() => setView(HabitView.Yearly)}
-                        className={`${view == HabitView.Yearly ? "bg-neutral-500" : ""}`}
-                    >
-                        yearly
-                    </button>
+                    {Object.values(HabitView).map(viewOption => (
+                        <button
+                            key={viewOption}
+                            onClick={() => setView(viewOption)}
+                            className={`${view === viewOption ? "bg-neutral-500" : ""}`}
+                        >
+                            {viewOption}
+                        </button>
+                    ))}
                 </div>
 
                 <ul className="flex flex-col gap-y-8">
                     {habits.map(habit =>
-                        <li key={habit.id}>
+                        <li
+                            key={habit.id}
+                            className="border rounded-sm p-2"
+                            style={{
+                                borderColor: habit.color,
+                                backgroundColor: `${habit.color}10`
+                            }}
+                        >
                             <div className="flex justify-center items-center gap-x-2 mb-1">
-                                <p className="text-center">{habit.habit}</p>
+                                <p
+                                    className="text-center"
+                                    style={{ color: habit.color }}
+                                >
+                                    {habit.habit}
+                                </p>
                                 <button
                                     onClick={() => {
                                         setHabitToEdit(habit);
                                         setFormOpen(true);
                                     }}
+                                    style={{ borderColor: habit.color }}
                                 >
-                                    <Pencil size={16} />
+                                    <Pencil
+                                        size={16}
+                                        style={{ color: habit.color }}
+                                    />
                                 </button>
                                 <button
                                     onClick={() => handleDeleteHabit(habit.id)}
+                                    style={{ borderColor: habit.color }}
                                 >
-                                    <Trash size={16} />
+                                    <Trash
+                                        size={16}
+                                        style={{ color: habit.color }}
+                                    />
                                 </button>
                             </div>
-                            <div className="flex flex-wrap max-w-125">
+                            <div className="flex flex-wrap max-w-120">
                                 {dates.map(date =>
                                     <div
                                         key={date}
-                                        className={`
-                                            ${habit.completions.includes(date as string) ? "bg-green-200" : "bg-red-200"}
-                                            w-8 h-8 border border-gray-700 cursor-pointer
-                                        `}
+                                        className="w-8 h-8 border border-neutral-800 cursor-pointer"
+                                        style={{
+                                            backgroundColor: habit.completions.includes(date as string) ? habit.color : "var(--bg-color)"
+                                        }}
                                         onClick={() => handleCompleteHabit(habit.id, date as string, habit.completions.includes(date as string))}
                                     ></div>
                                 )}
