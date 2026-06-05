@@ -1,4 +1,6 @@
-import type { User } from "../types";
+import { useEffect, useState } from "react";
+import TodoForm from "../components/TodoForm";
+import type { Todo, NewTodo, User } from "../types";
 
 interface TodoPageProps {
     user: User;
@@ -6,8 +8,62 @@ interface TodoPageProps {
 }
 
 const TodoPage = ({ user, handleGainXp }: TodoPageProps) => {
+    const [todos, setTodos] = useState<Todo[]>([]);
+    const [formOpen, setFormOpen] = useState<boolean>(false);
+
+    const fetchTodos = async () => {
+        try {
+            const res = await fetch("/api/todos");
+            if (!res.ok) {
+                throw new Error(`Failed to fetch todos: ${res.status}`);
+            }
+
+            const data = await res.json();
+            setTodos(data.todos);
+        }
+        catch (err) {
+            console.error("Failed to fetch todos: ", err);
+        }
+    };
+
+    useEffect(() => {
+        fetchTodos();
+    }, []);
+
+    const handleAddTodo = async (newTodo: NewTodo) => {
+        setFormOpen(false);
+
+        const res = await fetch("/api/todos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newTodo)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            setTodos(prev => [...prev, data.todo]);
+        }
+    };
+
     return (
-        <div>todo page</div>
+        <div>
+            <div className="max-w-xl mx-auto flex flex-col items-center pt-8 pb-16 gap-y-8">
+                <ul className="flex flex-col gap-y-8">
+                    {todos.map(todo =>
+                        <li key={todo.id} className="flex items-center gap-x-2">
+                            <input type="checkbox" />
+                            <p>{todo.task}</p>
+                        </li>
+                    )}
+                </ul>
+                <button onClick={() => setFormOpen(true)}>
+                    add task
+                </button>
+            </div>
+
+            {formOpen && <TodoForm handleAddTodo={handleAddTodo} setOpen={setFormOpen} />}
+        </div>
     );
 };
 

@@ -173,10 +173,7 @@ const server = serve({
             async GET(req) {
                 const user = verifyToken(req);
                 if (!user) {
-                    return Response.json(
-                        { error: "Unauthorized" },
-                        { status: 401 }
-                    );
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
                 }
 
                 const res = await db.execute({
@@ -203,10 +200,7 @@ const server = serve({
             async POST(req) {
                 const user = verifyToken(req);
                 if (!user) {
-                    return Response.json(
-                        { error: "Unauthorized" },
-                        { status: 401 }
-                    );
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
                 }
 
                 const { habit, color } = await req.json();
@@ -335,6 +329,49 @@ const server = serve({
                 });
 
                 return Response.json({ success: true });
+            }
+        },
+
+        // Todo endpoints
+        "/api/todos": {
+            async GET(req) {
+                const token = verifyToken(req);
+                if (!token) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+
+                const res = await db.execute({
+                    sql: `
+                        SELECT *
+                        FROM todos
+                        WHERE userId = ?
+                    `,
+                    args: [token.id]
+                });
+
+                return Response.json({ todos: res.rows });
+            },
+            async POST(req) {
+                const token = verifyToken(req);
+                if (!token) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+
+                const { task } = await req.json();
+
+                const res = await db.execute({
+                    sql: `
+                        INSERT INTO todos (userId, task)
+                        VALUES (?, ?)
+                        RETURNING *
+                    `,
+                    args: [token.id, task]
+                });
+
+                return Response.json({
+                    success: true,
+                    todo: res.rows[0]
+                });
             }
         }
     },

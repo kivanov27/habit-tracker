@@ -23,3 +23,10 @@ export enum HabitView {
     Monthly = "monthly",
     Yearly = "yearly"
 }
+
+export interface Todo {
+    id: number;
+    task: string;
+}
+
+export type NewTodo = Omit<Todo, 'id'>;

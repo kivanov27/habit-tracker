@@ -1,4 +1,4 @@
-import type { Habit, NewHabit } from "@/types";
+import type { Habit, NewHabit } from "../types";
 import { useState } from "react";
 
 interface HabitFormProps {
