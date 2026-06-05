@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginForm = () => {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
+    const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.SyntheticEvent) => {
@@ -39,13 +41,26 @@ const LoginForm = () => {
                 />
             </div>
 
-            <div className="flex gap-x-2 justify-end items-center">
+            <div className="flex gap-x-2 justify-end items-center relative">
                 <label>password:</label>
                 <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={({ target }) => setPassword(target.value)}
                 />
+                {showPassword ?
+                    <EyeOff
+                        size={16}
+                        onClick={() => setShowPassword(false)}
+                        className="absolute right-[-22] cursor-pointer"
+                    />
+                    :
+                    <Eye
+                        size={16}
+                        onClick={() => setShowPassword(true)}
+                        className="absolute right-[-22] cursor-pointer"
+                    />
+                }
             </div>
 
             {error && <p className="text-red-300">{error}</p>}

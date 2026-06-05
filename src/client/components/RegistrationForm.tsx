@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface RegistrationFormProps {
     setRegistering: React.Dispatch<React.SetStateAction<boolean>>;
@@ -9,6 +10,7 @@ const RegistrationForm = ({ setRegistering }: RegistrationFormProps) => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const handleRegistration = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -41,7 +43,7 @@ const RegistrationForm = ({ setRegistering }: RegistrationFormProps) => {
     };
 
     return (
-        <form 
+        <form
             onSubmit={handleRegistration}
             className="flex flex-col gap-y-4 w-fit"
         >
@@ -63,13 +65,26 @@ const RegistrationForm = ({ setRegistering }: RegistrationFormProps) => {
                 />
             </div>
 
-            <div className="flex gap-x-2 justify-end items-center">
+            <div className="flex gap-x-2 justify-end items-center relative">
                 <label>password:</label>
                 <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={({ target }) => setPassword(target.value)}
                 />
+                {showPassword ?
+                    <EyeOff
+                        size={16}
+                        onClick={() => setShowPassword(false)}
+                        className="absolute right-[-22] cursor-pointer"
+                    />
+                    :
+                    <Eye
+                        size={16}
+                        onClick={() => setShowPassword(true)}
+                        className="absolute right-[-22] cursor-pointer"
+                    />
+                }
             </div>
 
             {error && <p className="text-red-300">{error}</p>}

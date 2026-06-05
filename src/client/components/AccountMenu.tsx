@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { User } from "@/types";
+import type { User } from "../types";
 
 interface AccountMenuProps {
     user: User;
@@ -10,18 +10,23 @@ const AccountMenu = ({ user, handleLogout }: AccountMenuProps) => {
     const [menuVisible, setMenuVisible] = useState<boolean>(false);
 
     return (
-        <div className="flex gap-x-4 items-center">
-            <p>Level {user.level}</p>
-            <div className="flex gap-x-2 items-center">
-                <div className="w-36 h-4 bg-gray-500">
-                    <div
-                        className="h-full bg-(--text-color)"
-                        style={{ width: `${user.xp}%` }}
-                    >
+        <div className="flex items-center justify-between">
+            {/* Level display */}
+            <div className="flex items-center gap-x-4">
+                <p>Level {user.level}</p>
+                <div className="flex gap-x-2 items-center">
+                    <div className="w-36 h-4 bg-gray-500">
+                        <div
+                            className="h-full bg-(--text-color)"
+                            style={{ width: `${user.xp}%` }}
+                        >
+                        </div>
                     </div>
+                    <p>{user.xp} / 100 XP</p>
                 </div>
-                <p>{user.xp} / 100 XP</p>
             </div>
+
+            {/* User button */}
             <div>
                 <button onClick={() => setMenuVisible(!menuVisible)}>
                     <span className="font-bold">{user.username}</span>

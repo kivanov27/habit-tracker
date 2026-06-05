@@ -5,6 +5,7 @@ import type { User } from "./types";
 import Header from "./components/Header";
 import HabitPage from "./pages/HabitPage";
 import TodoPage from "./pages/TodoPage";
+import Navigation from "./components/Navigation";
 
 const App = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -74,6 +75,8 @@ const App = () => {
                 <Route path="/habits" element={<HabitPage user={user} handleGainXp={handleGainXp} />} />
                 <Route path="/todos" element={<TodoPage user={user} handleGainXp={handleGainXp} />} />
             </Routes>
+
+            <Navigation />
         </div>
     );
 }

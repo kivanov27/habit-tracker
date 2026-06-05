@@ -183,7 +183,7 @@ const HabitPage = ({ user, handleGainXp }: HabitsProps) => {
                                 {dates.map(date =>
                                     <div
                                         key={date}
-                                        className="w-8 h-8 border border-neutral-800 cursor-pointer"
+                                        className="w-8 h-8 border border-neutral-700 cursor-pointer"
                                         style={{
                                             backgroundColor: habit.completions.includes(date as string) ? habit.color : "var(--bg-color)"
                                         }}

@@ -23,22 +23,22 @@ const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen }: 
     };
 
     return (
-        <div 
+        <div
             onClick={() => setOpen(false)}
             className="w-screen h-screen bg-black/50 fixed top-0 left-0 flex justify-center items-center"
         >
-            <form 
+            <form
                 onSubmit={submitForm}
                 onClick={(e) => e.stopPropagation()}
-                className="flex flex-col border-2 border-(--text-color) w-4xl mx-auto my-auto p-8 items-center gap-y-4 bg-(--bg-color) rounded-sm"
+                className="w-xl mx-auto my-auto p-8 border-2 border-(--text-color) bg-(--bg-color) rounded-sm flex flex-col items-center gap-y-4"
             >
                 <div className="flex gap-x-2 items-center">
                     <label>habit:</label>
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         required
                         value={habit}
-                        onChange={({ target }) => setHabit(target.value)} 
+                        onChange={({ target }) => setHabit(target.value)}
                         className="rounded-sm"
                     />
                 </div>
@@ -54,7 +54,7 @@ const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen }: 
                 </div>
 
                 <div className="flex gap-x-2">
-                    <button 
+                    <button
                         type="submit"
                     >
                         {existingHabit ? "edit" : "submit"}
