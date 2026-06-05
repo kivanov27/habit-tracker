@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { User } from "../types";
 
 interface AccountMenuProps {
@@ -8,9 +8,27 @@ interface AccountMenuProps {
 
 const AccountMenu = ({ user, handleLogout }: AccountMenuProps) => {
     const [menuVisible, setMenuVisible] = useState<boolean>(false);
+    const menuRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!menuVisible) return;
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setMenuVisible(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [menuVisible]);
 
     return (
         <div className="flex items-center justify-between">
+
             {/* Level display */}
             <div className="flex items-center gap-x-4">
                 <p>Level {user.level}</p>
@@ -27,7 +45,7 @@ const AccountMenu = ({ user, handleLogout }: AccountMenuProps) => {
             </div>
 
             {/* User button */}
-            <div>
+            <div className="relative" ref={menuRef}>
                 <button onClick={() => setMenuVisible(!menuVisible)}>
                     <span className="font-bold">{user.username}</span>
                 </button>
@@ -42,6 +60,7 @@ const AccountMenu = ({ user, handleLogout }: AccountMenuProps) => {
                     </li>
                 </ul>
             </div>
+
         </div>
     );
 };
