@@ -9,7 +9,6 @@ const server = serve({
     routes: {
         // Serve index.html for all unmatched routes.
         "/*": index,
-
         // User endpoints
         "/api/me": {
             async GET(req) {
@@ -29,7 +28,6 @@ const server = serve({
                 return Response.json({ authentication: true, user: res.rows[0] });
             },
         },
-
         "/api/register": {
             async POST(req) {
                 const { username, email, password } = await req.json();
@@ -47,7 +45,6 @@ const server = serve({
                 return Response.json({ success: true });
             },
         },
-
         "/api/login": {
             async POST(req) {
                 const { username, password } = await req.json();
@@ -95,7 +92,6 @@ const server = serve({
                 });
             },
         },
-
         "/api/logout": {
             async POST() {
                 return new Response(JSON.stringify({ success: true }), {
@@ -106,7 +102,6 @@ const server = serve({
                 });
             },
         },
-
         "/api/protected": {
             async GET(req) {
                 const token = verifyToken(req);
@@ -119,7 +114,6 @@ const server = serve({
                 return Response.json({ success: true });
             },
         },
-
         "/api/users/xp": {
             async POST(req) {
                 const token = verifyToken(req);
@@ -167,7 +161,6 @@ const server = serve({
                 });
             },
         },
-
         // Habit endpoints
         "/api/habits": {
             async GET(req) {
@@ -196,7 +189,6 @@ const server = serve({
 
                 return Response.json({ habits });
             },
-
             async POST(req) {
                 const user = verifyToken(req);
                 if (!user) {
@@ -223,7 +215,6 @@ const server = serve({
                 });
             },
         },
-
         "/api/habits/:id": {
             async PUT(req) {
                 const user = verifyToken(req);
@@ -281,7 +272,6 @@ const server = serve({
                 return Response.json({ success: true });
             }
         },
-
         "/api/habits/completions/:id": {
             async POST(req) {
                 const url = new URL(req.url);
@@ -306,7 +296,6 @@ const server = serve({
 
                 return Response.json({ success: true });
             },
-
             async DELETE(req) {
                 const url = new URL(req.url);
                 const date = url.searchParams.get("date");
@@ -331,7 +320,6 @@ const server = serve({
                 return Response.json({ success: true });
             }
         },
-
         // Todo endpoints
         "/api/todos": {
             async GET(req) {
@@ -375,7 +363,6 @@ const server = serve({
             }
         }
     },
-
     development: process.env.NODE_ENV !== "production" && {
         // Enable browser hot reloading in development
         hmr: true,
