@@ -51,6 +51,16 @@ const TodoPage = ({ user, handleGainXp }: TodoPageProps) => {
         setTodos(prev => prev.map(t =>
             t.id == todo.id ? { ...todo, completed: true } : t
         ));
+
+        setTimeout(async () => {
+            setTodos(prev => prev.filter(t => t.id !== todo.id));
+            handleGainXp(1);
+
+            await fetch(`/api/todos/${todo.id}`, {
+                method: "DELETE"
+            });
+        }, 500);
+
     };
 
     return (

@@ -261,7 +261,7 @@ const server = serve({
                     return Response.json({ error: "Invalid id" }, { status: 400 });
                 }
 
-                await db.execute({
+                const res = await db.execute({
                     sql: `
                         DELETE FROM habits
                         WHERE id = ? AND userId = ?
@@ -269,6 +269,9 @@ const server = serve({
                     args: [habitId, user.id]
                 });
 
+                if (res.rowsAffected === 0) {
+                    return Response.json({ error: "Habit not found" }, { status: 404 });
+                }
                 return Response.json({ success: true });
             }
         },
@@ -309,7 +312,7 @@ const server = serve({
                     return Response.json({ error: "Invalid id" }, { status: 400 });
                 }
 
-                await db.execute({
+                const res = await db.execute({
                     sql: `
                         DELETE FROM habitCompletions
                         WHERE habitId = ? AND completedAt = ? AND userId = ?
@@ -317,6 +320,9 @@ const server = serve({
                     args: [habitId, date, user.id]
                 });
 
+                if (res.rowsAffected === 0) {
+                    return Response.json({ error: "Habit completion not found" }, { status: 404 });
+                }
                 return Response.json({ success: true });
             }
         },
@@ -360,6 +366,28 @@ const server = serve({
                     success: true,
                     todo: res.rows[0]
                 });
+            }
+        },
+
+        "/api/todos/:id": {
+            async DELETE(req) {
+                const token = verifyToken(req);
+                if (!token) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+
+                const res = await db.execute({
+                    sql: `
+                        DELETE FROM todos
+                        WHERE id = ?
+                    `,
+                    args: [req.params.id]
+                });
+
+                if (res.rowsAffected === 0) {
+                    return Response.json({ error: "Todo item not found" }, { status: 404 });
+                }
+                return Response.json({ success: true });
             }
         }
     },
