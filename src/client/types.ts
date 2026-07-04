@@ -27,6 +27,7 @@ export enum HabitView {
 export interface Todo {
     id: number;
     task: string;
+    completed: boolean;
 }
 
 export type NewTodo = Omit<Todo, 'id'>;

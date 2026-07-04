@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import TodoForm from "../components/TodoForm";
+import TodoItem from "../components/TodoItem";
 import type { Todo, NewTodo, User } from "../types";
 
 interface TodoPageProps {
@@ -46,15 +47,18 @@ const TodoPage = ({ user, handleGainXp }: TodoPageProps) => {
         }
     };
 
+    const handleCompleteTodo = async (todo: Todo) => {
+        setTodos(prev => prev.map(t =>
+            t.id == todo.id ? { ...todo, completed: true } : t
+        ));
+    };
+
     return (
         <div>
             <div className="max-w-xl mx-auto flex flex-col items-center pt-8 pb-16 gap-y-8">
                 <ul className="flex flex-col gap-y-8">
                     {todos.map(todo =>
-                        <li key={todo.id} className="flex items-center gap-x-2">
-                            <input type="checkbox" />
-                            <p>{todo.task}</p>
-                        </li>
+                        <TodoItem key={todo.id} todo={todo} handleComplete={handleCompleteTodo} />
                     )}
                 </ul>
                 <button onClick={() => setFormOpen(true)}>
