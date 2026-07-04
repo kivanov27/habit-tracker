@@ -52,6 +52,7 @@ const HabitPage = ({ user, handleGainXp }: HabitsProps) => {
             default: days = 7;
         }
 
+        // an obj with length property is used to create an array with undefined values of that size
         setDates(Array.from({ length: days }, (_, i) => {
             const date = new Date();
             date.setDate(date.getDate() - i);
@@ -190,10 +191,10 @@ const HabitPage = ({ user, handleGainXp }: HabitsProps) => {
                                 </button>
                             </div>
                             <div className="flex flex-wrap max-w-120">
-                                {dates.map(date =>
+                                {dates.map((date, i) =>
                                     <div
                                         key={date}
-                                        className="w-8 h-8 border border-neutral-700 cursor-pointer"
+                                        className={`${i == dates.length - 1 ? "border-neutral-300" : "border-neutral-700"} w-8 h-8 border cursor-pointer`}
                                         style={{
                                             backgroundColor: habit.completions.includes(date as string) ? habit.color : "var(--bg-color)"
                                         }}
