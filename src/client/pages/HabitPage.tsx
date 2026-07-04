@@ -210,7 +210,14 @@ const HabitPage = ({ user, handleGainXp }: HabitsProps) => {
                 </button>
             </div>
 
-            {formOpen && <HabitForm handleAddHabit={handleAddHabit} handleEditHabit={handleEditHabit} existingHabit={habitToEdit} setOpen={setFormOpen} />}
+            {formOpen &&
+                <HabitForm
+                    handleAddHabit={handleAddHabit}
+                    handleEditHabit={handleEditHabit}
+                    existingHabit={habitToEdit}
+                    setOpen={setFormOpen}
+                />
+            }
         </div>
     );
 };
