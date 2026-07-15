@@ -370,6 +370,40 @@ const server = serve({
         },
 
         "/api/todos/:id": {
+            async PUT(req) {
+                const token = verifyToken(req);
+                const id = Number(req.params.id);
+                const updatedTodo = await req.json();
+
+                if (!token) {
+                    return Response.json({ error: "Unauthorized" }, { status: 401 });
+                }
+                else if (isNaN(id)) {
+                    return Response.json({ error: "Invalid id" }, { status: 400 });
+                }
+
+                const res = await db.execute({
+                    sql: `
+                        UPDATE todos
+                        SET task = ?
+                        WHERE id = ? AND userId = ?
+                        RETURNING *
+                    `,
+                    args: [updatedTodo.task, id, token.id]
+                });
+
+                if (res.rows.length === 0) {
+                    return Response.json(
+                        { error: "Todo not found" },
+                        { status: 404 }
+                    );
+                }
+
+                return Response.json({
+                    success: true,
+                    updatedTodo: res.rows[0]
+                });
+            },
             async DELETE(req) {
                 const token = verifyToken(req);
                 if (!token) {

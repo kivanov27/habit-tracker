@@ -14,6 +14,7 @@ const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen }: 
 
     const submitForm = async (e: React.SyntheticEvent) => {
         e.preventDefault();
+
         if (existingHabit && handleEditHabit) {
             handleEditHabit({ ...existingHabit, habit, color });
         }

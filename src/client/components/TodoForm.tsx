@@ -1,17 +1,25 @@
 import { useState } from "react";
-import type { NewTodo } from "../types";
+import type { Todo, NewTodo } from "../types";
 
 interface TodoFormProps {
     handleAddTodo: (newTodo: NewTodo) => void;
+    handleEditTodo?: (updatedTodo: Todo) => void;
+    existingTodo?: Todo | null;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TodoForm = ({ handleAddTodo, setOpen }: TodoFormProps) => {
-    const [task, setTask] = useState<string>("");
+const TodoForm = ({ handleAddTodo, handleEditTodo, existingTodo, setOpen }: TodoFormProps) => {
+    const [task, setTask] = useState<string>(existingTodo?.task ?? "");
 
     const submitForm = async (e: React.SyntheticEvent) => {
         e.preventDefault();
-        handleAddTodo({ task });
+
+        if (existingTodo && handleEditTodo) {
+            handleEditTodo({ ...existingTodo, task });
+        }
+        else {
+            handleAddTodo({ task, completed: false });
+        }
     };
 
     return (
@@ -35,9 +43,17 @@ const TodoForm = ({ handleAddTodo, setOpen }: TodoFormProps) => {
                     />
                 </div>
 
-                <button type="submit">
-                    submit
-                </button>
+                <div className="flex gap-x-2">
+                    <button type="submit">
+                        {existingTodo ? "edit" : "submit"}
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setOpen(false);
+                        }}
+                    >close</button>
+                </div>
             </form>
         </div>
     );
