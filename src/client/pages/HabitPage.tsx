@@ -217,6 +217,7 @@ const HabitPage = ({ user, handleGainXp }: HabitsProps) => {
                     handleEditHabit={handleEditHabit}
                     existingHabit={habitToEdit}
                     setOpen={setFormOpen}
+                    habitsLength={habits.length}
                 />
             }
         </div>

@@ -178,6 +178,7 @@ const server = serve({
                         LEFT JOIN habitCompletions ON habits.id = habitCompletions.habitId
                         WHERE habits.userId = ?
                         GROUP BY habits.id
+                        ORDER BY habits.pos
                     `,
                     args: [user.id],
                 });

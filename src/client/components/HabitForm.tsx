@@ -6,11 +6,13 @@ interface HabitFormProps {
     handleEditHabit?: (updatedHabit: Habit) => void;
     existingHabit?: Habit | null;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    habitsLength: number;
 }
 
-const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen }: HabitFormProps) => {
+const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen, habitsLength }: HabitFormProps) => {
     const [habit, setHabit] = useState<string>(existingHabit?.habit ?? "");
     const [color, setColor] = useState<string>(existingHabit?.color ?? "#000000");
+    const [pos, setPos] = useState<number>(existingHabit?.pos ?? habitsLength)
 
     const submitForm = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -19,7 +21,7 @@ const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen }: 
             handleEditHabit({ ...existingHabit, habit, color });
         }
         else {
-            handleAddHabit({ habit, color });
+            handleAddHabit({ habit, color, pos });
         }
     };
 
@@ -50,6 +52,16 @@ const HabitForm = ({ handleAddHabit, handleEditHabit, existingHabit, setOpen }: 
                         type="color"
                         value={color}
                         onChange={({ target }) => setColor(target.value)}
+                        className="rounded-sm"
+                    />
+                </div>
+
+                <div className="flex gap-x-2 items-center">
+                    <label>position:</label>
+                    <input
+                        type="number"
+                        value={pos}
+                        onChange={({ target }) => setPos(target.value == "" ? 0 : target.valueAsNumber)}
                         className="rounded-sm"
                     />
                 </div>

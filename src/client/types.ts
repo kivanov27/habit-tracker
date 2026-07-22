@@ -11,11 +11,13 @@ export interface Habit {
     habit: string;
     color: string;
     completions: string[];
+    pos: number;
 }
 
 export interface NewHabit {
     habit: string;
     color: string;
+    pos: number;
 }
 
 export enum HabitView {
